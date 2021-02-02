@@ -93,9 +93,12 @@ Lr: 1.715e-04 | Update: 6.290e-03 mean,1.245e-02 std | Epoch: [0][40/2391] | Tim
      * ``-s [String]``: Eval on Validation or Train (standard eval on both separately)
      * ```-u [String]```: If you want to infer using an Uncertainty model (default ```false```)
      * ```-c [Int]```: Number of MC sampling to do (default ```30```)
-   * If you want to infer&evaluate a model that you saved to ````/salsanext/logs/[the desired run]```` and you
-   want to infer$eval only the validation and save the label prediction to ```/pred```:
-     * ```./eval.sh -d /dataset -p /pred -m /salsanext/logs/[the desired run] -s validation -n salsanext```
+     * ```-g [Int]```: GPU ID (default ```x```)
+     * ```-n [Int]```: what is this? (default ```xx```)
+   * If you want to infer&evaluate a model that you saved to ````/home/user/workspace/SalsaNext/pretrained```` and you
+   want to infer and eval only the validation and save the label prediction to ```/home/user/workspace/SalsaNext/pred```:
+     * <del> ```./eval.sh -d /dataset -p /pred -m /salsanext/logs/[the desired run] -s validation -n salsanext``` </del>
+     * ```./eval.sh -d /home/user/workspace/dataset/semantic_kitti/dataset/ -p /home/user/workspace/SalsaNext/pred -m /home/user/workspace/SalsaNext/pretrained -s valid -n salsanext -c 30 -g 0```
      
 ### Pretrained Model
 

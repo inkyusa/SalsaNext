@@ -61,8 +61,14 @@ def eval(test_sequences,splits,pred):
     # print(pred_names)
 
     # check that I have the same number of files
-    # print("labels: ", len(label_names))
-    # print("predictions: ", len(pred_names))
+    print("labels: ", len(label_names))
+    # for label_name in label_names:
+    #     print(label_name)
+    print("predictions: ", len(pred_names))
+    # for pred_name in pred_names:
+    #     print(pred_name)
+    
+
     assert (len(label_names) == len(scan_names) and
             len(label_names) == len(pred_names))
 

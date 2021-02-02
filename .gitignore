@@ -2,4 +2,8 @@
 *.pyc
 logs/
 pretrained/
+pred/
+terminal_logs/
 .vscode/
+
+*.zip

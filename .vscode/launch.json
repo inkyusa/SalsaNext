@@ -15,7 +15,7 @@
                 "-d",
                 "/home/sa001/workspace/dataset/semantic_kitti/dataset",
                 "-p",
-                "/home/sa001/workspace/SalsaNext/pred_valid2",
+                "/home/sa001/workspace/SalsaNext/pred_valid",
                 "-m",
                 "/home/sa001/workspace/SalsaNext/models/pretrained",
                 "-n",
@@ -26,6 +26,25 @@
                 "false",
                 "-c",
                 "30"
+            ],
+        },
+        {
+            "name": "Python: Visualising",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/train/tasks/semantic/visualize.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/train/tasks/semantic",
+            "args": [
+                "--dataset",
+                "/home/sa001/workspace/dataset/semantic_kitti/dataset",
+                "--sequence",
+                "08",
+                "--predictions",
+                "/home/sa001/workspace/SalsaNext/pred_valid/",
+                "--ignore_safety",
+                "--offset",
+                "80"
             ],
         }
     ]

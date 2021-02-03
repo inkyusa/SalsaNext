@@ -109,24 +109,30 @@ if __name__ == '__main__':
     # does sequence folder exist?
     if not FLAGS.ignore_semantics:
         if FLAGS.predictions is not None:
-            label_paths = os.path.join(FLAGS.predictions, "sequences",
+            pred_label_paths = os.path.join(FLAGS.predictions, "sequences",
                                        FLAGS.sequence, "predictions")
-        else:
-            label_paths = os.path.join(FLAGS.dataset, "sequences",
+            gt_label_paths = os.path.join(FLAGS.dataset, "sequences",
                                        FLAGS.sequence, "labels")
-        if os.path.isdir(label_paths):
-            print("Labels folder exists! Using labels from %s" % label_paths)
+        else:
+            gt_label_paths = os.path.join(FLAGS.dataset, "sequences",
+                                       FLAGS.sequence, "labels")
+        if os.path.isdir(pred_label_paths):
+            print("Labels folder exists! Using labels from %s" % pred_label_paths)
         else:
             print("Labels folder doesn't exist! Exiting...")
             quit()
         # populate the pointclouds
-        label_names = [os.path.join(dp, f) for dp, dn, fn in os.walk(
-            os.path.expanduser(label_paths)) for f in fn]
-        label_names.sort()
+        pred_label_names = [os.path.join(dp, f) for dp, dn, fn in os.walk(
+            os.path.expanduser(pred_label_paths)) for f in fn]
+        pred_label_names.sort()
+
+        gt_label_names = [os.path.join(dp, f) for dp, dn, fn in os.walk(
+            os.path.expanduser(gt_label_paths)) for f in fn]
+        gt_label_names.sort()
 
         # check that there are same amount of labels and scans
         if not FLAGS.ignore_safety:
-            assert (len(label_names) == len(scan_names))
+            assert (len(pred_label_names) == len(scan_names))
 
     # create a scan
     if FLAGS.ignore_semantics:
@@ -141,7 +147,8 @@ if __name__ == '__main__':
         label_names = None
     vis = LaserScanVis(scan=scan,
                        scan_names=scan_names,
-                       label_names=label_names,
+                       pred_label_names=pred_label_names,
+                       gt_label_names=gt_label_names,
                        offset=FLAGS.offset,
                        semantics=semantics,
                        instances=False)
@@ -150,6 +157,7 @@ if __name__ == '__main__':
     print("To navigate:")
     print("\tb: back (previous scan)")
     print("\tn: next (next scan)")
+    print("\tspace: toggle continous play")
     print("\tq: quit (exit program)")
 
     # run the visualizer

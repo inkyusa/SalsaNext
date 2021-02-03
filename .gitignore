@@ -1,9 +1,11 @@
 .idea
 *.pyc
 logs/
-pretrained/
-pred/
+pred*/
 terminal_logs/
 .vscode/
+models/
+
 
 *.zip
+*.label

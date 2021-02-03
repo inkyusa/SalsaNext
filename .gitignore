@@ -3,7 +3,6 @@
 logs/
 pred*/
 terminal_logs/
-.vscode/
 models/
 
 

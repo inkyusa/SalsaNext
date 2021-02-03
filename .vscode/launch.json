@@ -1,0 +1,32 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Inferencing",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/train/tasks/semantic/infer.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/train/tasks/semantic",
+            "args": [
+                "-d",
+                "/home/sa001/workspace/dataset/semantic_kitti/dataset",
+                "-p",
+                "/home/sa001/workspace/SalsaNext/pred_valid2",
+                "-m",
+                "/home/sa001/workspace/SalsaNext/models/pretrained",
+                "-n",
+                "salsanext",
+                "-s",
+                "valid",
+                "-u",
+                "false",
+                "-c",
+                "30"
+            ],
+        }
+    ]
+}

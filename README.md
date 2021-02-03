@@ -100,9 +100,18 @@ Lr: 1.715e-04 | Update: 6.290e-03 mean,1.245e-02 std | Epoch: [0][40/2391] | Tim
      * <del> ```./eval.sh -d /dataset -p /pred -m /salsanext/logs/[the desired run] -s validation -n salsanext``` </del>
      * ```./eval.sh -d /home/user/workspace/dataset/semantic_kitti/dataset/ -p /home/user/workspace/SalsaNext/pred -m /home/user/workspace/SalsaNext/pretrained -s valid -n salsanext -c 30 -g 0```
      
-### Pretrained Model
+  * [Visualization](train/tasks/semantic/visualize.py)
+    * 
+    
+### Pretrained Model download
+<del> [SalsaNext](https://cutt.ly/bpadjGj) </del>
 
-[SalsaNext](https://cutt.ly/bpadjGj)
+One can easily download the author provided pretrained weights and our in-house trained model (150 epoch) by running
+```
+SalsaNext$./get_pretrained_models.sh
+```
+This script will download two models from this repo and store them under `SalsaNext/models/pretrained` and `SalsaNext/models/first_trained`.
+
      
 ### Disclamer
 

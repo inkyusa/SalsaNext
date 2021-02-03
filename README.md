@@ -24,7 +24,7 @@ First create the anaconda env with:
 
 To train/eval you can use the following scripts:
 
-
+### Training
  * [Training script](train.sh) (you might need to chmod +x the file)
    * We have the following options:
      * ```-d [String]``` : Path to the dataset
@@ -84,6 +84,16 @@ Lr: 1.297e-04 | Update: 6.514e-03 mean,1.258e-02 std | Epoch: [0][30/2391] | Tim
 Lr: 1.715e-04 | Update: 6.290e-03 mean,1.245e-02 std | Epoch: [0][40/2391] | Time 1.175 (1.316) | Data 0.036 (0.054) | Loss 4.1102 (4.1336) | acc 0.050 (0.047) | IoU 0.015 (0.014) | [5 days, 16:27:57]
 ```
 
+### Pretrained Model download
+<del> [SalsaNext](https://cutt.ly/bpadjGj) </del>
+
+One can easily download the author provided pretrained weights and our in-house trained model (150 epoch) by running
+```
+SalsaNext$./get_pretrained_models.sh
+```
+This script will download two models from this repo and store them under `SalsaNext/models/pretrained` and `SalsaNext/models/first_trained`.
+
+### Prediction and Evalution
 
  * [Eval script](eval.sh) (you might need to chmod +x the file)
    * We have the following options:
@@ -95,22 +105,27 @@ Lr: 1.715e-04 | Update: 6.290e-03 mean,1.245e-02 std | Epoch: [0][40/2391] | Tim
      * ```-c [Int]```: Number of MC sampling to do (default ```30```)
      * ```-g [Int]```: GPU ID (default ```x```)
      * ```-n [Int]```: what is this? (default ```xx```)
-   * If you want to infer&evaluate a model that you saved to ````/home/user/workspace/SalsaNext/pretrained```` and you
-   want to infer and eval only the validation and save the label prediction to ```/home/user/workspace/SalsaNext/pred```:
-     * <del> ```./eval.sh -d /dataset -p /pred -m /salsanext/logs/[the desired run] -s validation -n salsanext``` </del>
-     * ```./eval.sh -d /home/user/workspace/dataset/semantic_kitti/dataset/ -p /home/user/workspace/SalsaNext/pred -m /home/user/workspace/SalsaNext/pretrained -s valid -n salsanext -c 30 -g 0```
      
-  * [Visualization](train/tasks/semantic/visualize.py)
-    * 
-    
-### Pretrained Model download
-<del> [SalsaNext](https://cutt.ly/bpadjGj) </del>
+     and the following command will perform inferencing and evaluation.
+     
+     ```
+     ./eval.sh -d /home/user/workspace/dataset/semantic_kitti/dataset/ -p /home/user/workspace/SalsaNext/pred_valid -m /home/user/workspace/SalsaNext/models/pretrained -s valid -n salsanext -c 30 -g 0
+     ```
+     `-d` indicates the location of `semantic_kitti` dataset, `-p` is pointing to the folder that will be created and stored all predictions. `-m` denotes the model path one that you want to use for the prediction, `-s` refers to which data split you want to evaluate on (e.g., `[train, valid, test]`). Other switch options are already explained above, please have a look for (`-c`, `-g`, and `-n`).
 
-One can easily download the author provided pretrained weights and our in-house trained model (150 epoch) by running
-```
-SalsaNext$./get_pretrained_models.sh
-```
-This script will download two models from this repo and store them under `SalsaNext/models/pretrained` and `SalsaNext/models/first_trained`.
+### Visualization
+
+  * [Visualization](train/tasks/semantic/visualize.py)
+    * This python script is similar to Semantic-KITTI [visualisation](https://github.com/PRBonn/semantic-kitti-api/blob/master/visualize.py). Assuming that you have `semantic_kitti dataset` stored under `/home/user/workspace/dataset/semantic_kitti/dataset/` (note that the next depth is `sequences`) and want to visualise `sequence 08` (validation) that already generated from above step at `/home/user/workspace/SalsaNext/pred_valid`
+    
+    Assumsing you are at the root folder (i.e., `SalsaNext`)
+    ```
+    cd SalsaNext/train/tasks/semantic
+    $ python visualize.py --dataset /home/user/workspace/dataset/semantic_kitti/dataset/ --sequence 08 --predictions /home/user/workspace/SalsaNext/pred_valid/ --ignore_safety
+    ```
+    
+    
+
 
      
 ### Disclamer

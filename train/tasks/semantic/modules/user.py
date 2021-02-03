@@ -18,6 +18,7 @@ import numpy as np
 
 from tasks.semantic.modules.SalsaNext import *
 #from tasks.semantic.modules.SalsaNextUncertainty import *
+from tasks.semantic.modules.SalsaNextAdf import *
 from tasks.semantic.postproc.KNN import KNN
 
 

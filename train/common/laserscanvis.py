@@ -63,14 +63,14 @@ class LaserScanVis:
       visuals.XYZAxis(parent=self.sem_pred_view.scene)
       # self.sem_view.camera.link(self.scan_view.camera)
 
-      print("Using gt in visualizer")
-      self.sem_gt_view = vispy.scene.widgets.ViewBox(
-          border_color='white', parent=self.canvas.scene)
-      self.grid.add_widget(self.sem_gt_view, 0, 2)
-      self.sem_gt_vis = visuals.Markers()
-      self.sem_gt_view.camera = 'turntable'
-      self.sem_gt_view.add(self.sem_gt_vis)
-      visuals.XYZAxis(parent=self.sem_gt_view.scene)
+      # print("Using gt in visualizer")
+      # self.sem_gt_view = vispy.scene.widgets.ViewBox(
+      #     border_color='white', parent=self.canvas.scene)
+      # self.grid.add_widget(self.sem_gt_view, 0, 2)
+      # self.sem_gt_vis = visuals.Markers()
+      # self.sem_gt_view.camera = 'turntable'
+      # self.sem_gt_view.add(self.sem_gt_vis)
+      # visuals.XYZAxis(parent=self.sem_gt_view.scene)
       # self.sem_view.camera.link(self.scan_view.camera)
 
     if self.instances:
@@ -82,9 +82,9 @@ class LaserScanVis:
       self.inst_view.camera = 'turntable'
       self.inst_view.addr
     # img canvas size
-    self.multiplier = 1 * 2
-    self.canvas_W = 1024 * 2
-    self.canvas_H = 64 * 2
+    self.multiplier = 1
+    self.canvas_W = 1024 
+    self.canvas_H = 64
     if self.semantics:
       self.multiplier += 1
     if self.instances:
@@ -92,7 +92,7 @@ class LaserScanVis:
 
     # new canvas for img
     self.img_canvas = SceneCanvas(keys='interactive', show=True,
-                                  size=(self.canvas_W * self.multiplier, self.canvas_H * self.multiplier))
+                                  size=(self.canvas_W, self.canvas_H * self.multiplier))
     # grid
     self.img_grid = self.img_canvas.central_widget.add_grid()
     # interface (n next, b back, q quit, very simple)
@@ -114,11 +114,11 @@ class LaserScanVis:
       self.sem_pred_img_vis = visuals.Image(cmap='viridis')
       self.sem_pred_img_view.add(self.sem_pred_img_vis)
 
-      self.sem_gt_img_view = vispy.scene.widgets.ViewBox(
-          border_color='white', parent=self.img_canvas.scene)
-      self.img_grid.add_widget(self.sem_gt_img_view, 2, 0)
-      self.sem_gt_img_vis = visuals.Image(cmap='viridis')
-      self.sem_gt_img_view.add(self.sem_gt_img_vis)
+      # self.sem_gt_img_view = vispy.scene.widgets.ViewBox(
+      #     border_color='white', parent=self.img_canvas.scene)
+      # self.img_grid.add_widget(self.sem_gt_img_view, 2, 0)
+      # self.sem_gt_img_vis = visuals.Image(cmap='viridis')
+      # self.sem_gt_img_view.add(self.sem_gt_img_vis)
 
     # add instances
     if self.instances:
@@ -179,10 +179,10 @@ class LaserScanVis:
                             face_color=self.scan_pred.sem_label_color[..., ::-1],
                             edge_color=self.scan_pred.sem_label_color[..., ::-1],
                             size=1)
-      self.sem_gt_vis.set_data(self.scan_gt.points,
-                            face_color=self.scan_gt.sem_label_color[..., ::-1],
-                            edge_color=self.scan_gt.sem_label_color[..., ::-1],
-                            size=1)
+      # self.sem_gt_vis.set_data(self.scan_gt.points,
+      #                       face_color=self.scan_gt.sem_label_color[..., ::-1],
+      #                       edge_color=self.scan_gt.sem_label_color[..., ::-1],
+      #                       size=1)
 
     # plot instances
     if self.instances:
@@ -204,8 +204,8 @@ class LaserScanVis:
     if self.semantics:
       self.sem_pred_img_vis.set_data(self.scan_pred.proj_sem_color[..., ::-1])
       self.sem_pred_img_vis.update()
-      self.sem_gt_img_vis.set_data(self.scan_gt.proj_sem_color[..., ::-1])
-      self.sem_gt_img_vis.update()
+      # self.sem_gt_img_vis.set_data(self.scan_gt.proj_sem_color[..., ::-1])
+      # self.sem_gt_img_vis.update()
 
     if self.instances:
       self.inst_img_vis.set_data(self.scan.proj_inst_color[..., ::-1])

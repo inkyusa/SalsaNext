@@ -5,6 +5,30 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: Training",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/train/tasks/semantic/train.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/train/tasks/semantic",
+            "args": [
+                "-d",
+                "/home/sa001/workspace/dataset/semantic_kitti/dataset",
+                //"-ac",
+                //"/home/sa001/workspace/SalsaNext/salsanext.yml",
+                //"-dc",
+                //"/home/sa001/workspace/SalsaNext/train/tasks/semantic/config/labels/semantic-kitti-small-data-test.yaml",
+                "-p",
+                // "/home/sa001/workspace/SalsaNext/models/pretrained",
+                "",
+                // "/home/sa001/workspace/SalsaNext/models/first_trained",
+                "-l",
+                "/home/sa001/workspace/SalsaNext",
+                "-u",
+                "false"
+            ],
+        },
+        {
             "name": "Python: Inferencing",
             "type": "python",
             "request": "launch",
@@ -17,7 +41,8 @@
                 "-p",
                 "/home/sa001/workspace/SalsaNext/pred_valid",
                 "-m",
-                "/home/sa001/workspace/SalsaNext/models/pretrained",
+                //"/home/sa001/workspace/SalsaNext/models/pretrained",
+                "/home/sa001/workspace/SalsaNext/models/first_trained",
                 "-n",
                 "salsanext",
                 "-s",
@@ -44,7 +69,7 @@
                 "/home/sa001/workspace/SalsaNext/pred_valid/",
                 "--ignore_safety",
                 "--offset",
-                "80"
+                "0"
             ],
         }
     ]

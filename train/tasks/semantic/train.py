@@ -55,7 +55,8 @@ if __name__ == '__main__':
     parser.add_argument(
         '--arch_cfg', '-ac',
         type=str,
-        required=True,
+        required=False,
+        default='config/arch/salsanext.yml',
         help='Architecture yaml cfg file. See /config/arch for sample. No default!',
     )
     parser.add_argument(

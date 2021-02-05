@@ -10,14 +10,17 @@ from matplotlib import pyplot as plt
 class LaserScanVis:
   """Class that creates and handles a visualizer for a pointcloud"""
 
-  def __init__(self, scan, scan_names, label_names, offset=0,
+  def __init__(self, scan, scan_names, pred_label_names, gt_label_names, offset=0,
                semantics=True, instances=False):
-    self.scan = scan
+    self.scan_pred = scan
+    self.scan_gt = scan
     self.scan_names = scan_names
-    self.label_names = label_names
+    self.pred_label_names = pred_label_names
+    self.gt_label_names = gt_label_names
     self.offset = offset
     self.semantics = semantics
     self.instances = instances
+    self.timer = vispy.app.Timer('auto', iterations=1e9, connect=self.on_timer, start=False)
     # sanity check
     if not self.semantics and self.instances:
       print("Instances are only allowed in when semantics=True")
@@ -50,30 +53,37 @@ class LaserScanVis:
     visuals.XYZAxis(parent=self.scan_view.scene)
     # add semantics
     if self.semantics:
-      print("Using semantics in visualizer")
-      self.sem_view = vispy.scene.widgets.ViewBox(
+      print("Using pred semantics in visualizer")
+      self.sem_pred_view = vispy.scene.widgets.ViewBox(
           border_color='white', parent=self.canvas.scene)
-      self.grid.add_widget(self.sem_view, 0, 1)
-      self.sem_vis = visuals.Markers()
-      self.sem_view.camera = 'turntable'
-      self.sem_view.add(self.sem_vis)
-      visuals.XYZAxis(parent=self.sem_view.scene)
+      self.grid.add_widget(self.sem_pred_view, 0, 1)
+      self.sem_pred_vis = visuals.Markers()
+      self.sem_pred_view.camera = 'turntable'
+      self.sem_pred_view.add(self.sem_pred_vis)
+      visuals.XYZAxis(parent=self.sem_pred_view.scene)
+      # self.sem_view.camera.link(self.scan_view.camera)
+
+      # print("Using gt in visualizer")
+      # self.sem_gt_view = vispy.scene.widgets.ViewBox(
+      #     border_color='white', parent=self.canvas.scene)
+      # self.grid.add_widget(self.sem_gt_view, 0, 2)
+      # self.sem_gt_vis = visuals.Markers()
+      # self.sem_gt_view.camera = 'turntable'
+      # self.sem_gt_view.add(self.sem_gt_vis)
+      # visuals.XYZAxis(parent=self.sem_gt_view.scene)
       # self.sem_view.camera.link(self.scan_view.camera)
 
     if self.instances:
       print("Using instances in visualizer")
       self.inst_view = vispy.scene.widgets.ViewBox(
           border_color='white', parent=self.canvas.scene)
-      self.grid.add_widget(self.inst_view, 0, 2)
+      self.grid.add_widget(self.inst_view, 0, 3)
       self.inst_vis = visuals.Markers()
       self.inst_view.camera = 'turntable'
-      self.inst_view.add(self.inst_vis)
-      visuals.XYZAxis(parent=self.inst_view.scene)
-      # self.inst_view.camera.link(self.scan_view.camera)
-
+      self.inst_view.addr
     # img canvas size
     self.multiplier = 1
-    self.canvas_W = 1024
+    self.canvas_W = 1024 
     self.canvas_H = 64
     if self.semantics:
       self.multiplier += 1
@@ -98,17 +108,23 @@ class LaserScanVis:
 
     # add semantics
     if self.semantics:
-      self.sem_img_view = vispy.scene.widgets.ViewBox(
+      self.sem_pred_img_view = vispy.scene.widgets.ViewBox(
           border_color='white', parent=self.img_canvas.scene)
-      self.img_grid.add_widget(self.sem_img_view, 1, 0)
-      self.sem_img_vis = visuals.Image(cmap='viridis')
-      self.sem_img_view.add(self.sem_img_vis)
+      self.img_grid.add_widget(self.sem_pred_img_view, 1, 0)
+      self.sem_pred_img_vis = visuals.Image(cmap='viridis')
+      self.sem_pred_img_view.add(self.sem_pred_img_vis)
+
+      # self.sem_gt_img_view = vispy.scene.widgets.ViewBox(
+      #     border_color='white', parent=self.img_canvas.scene)
+      # self.img_grid.add_widget(self.sem_gt_img_view, 2, 0)
+      # self.sem_gt_img_vis = visuals.Image(cmap='viridis')
+      # self.sem_gt_img_view.add(self.sem_gt_img_vis)
 
     # add instances
     if self.instances:
       self.inst_img_view = vispy.scene.widgets.ViewBox(
           border_color='white', parent=self.img_canvas.scene)
-      self.img_grid.add_widget(self.inst_img_view, 2, 0)
+      self.img_grid.add_widget(self.inst_img_view, 3, 0)
       self.inst_img_vis = visuals.Image(cmap='viridis')
       self.inst_img_view.add(self.inst_img_vis)
 
@@ -125,10 +141,13 @@ class LaserScanVis:
 
   def update_scan(self):
     # first open data
-    self.scan.open_scan(self.scan_names[self.offset])
+    self.scan_pred.open_scan(self.scan_names[self.offset])
+    self.scan_gt.open_scan(self.scan_names[self.offset])
     if self.semantics:
-      self.scan.open_label(self.label_names[self.offset])
-      self.scan.colorize()
+      self.scan_pred.open_label(self.pred_label_names[self.offset])
+      self.scan_pred.colorize()
+      self.scan_gt.open_label(self.gt_label_names[self.offset])
+      self.scan_gt.colorize()
 
     # then change names
     title = "scan " + str(self.offset) + " of " + str(len(self.scan_names)-1)
@@ -140,7 +159,7 @@ class LaserScanVis:
     # plot scan
     power = 16
     # print()
-    range_data = np.copy(self.scan.unproj_range)
+    range_data = np.copy(self.scan_pred.unproj_range)
     # print(range_data.max(), range_data.min())
     range_data = range_data**(1 / power)
     # print(range_data.max(), range_data.min())
@@ -149,32 +168,33 @@ class LaserScanVis:
                      255).astype(np.uint8)
     viridis_map = self.get_mpl_colormap("viridis")
     viridis_colors = viridis_map[viridis_range]
-    self.scan_vis.set_data(self.scan.points,
+    self.scan_vis.set_data(self.scan_pred.points,
                            face_color=viridis_colors[..., ::-1],
                            edge_color=viridis_colors[..., ::-1],
                            size=1)
 
     # plot semantics
     if self.semantics:
-      self.sem_vis.set_data(self.scan.points,
-                            face_color=self.scan.sem_label_color[..., ::-1],
-                            edge_color=self.scan.sem_label_color[..., ::-1],
+      self.sem_pred_vis.set_data(self.scan_pred.points,
+                            face_color=self.scan_pred.sem_label_color[..., ::-1],
+                            edge_color=self.scan_pred.sem_label_color[..., ::-1],
                             size=1)
+      # self.sem_gt_vis.set_data(self.scan_gt.points,
+      #                       face_color=self.scan_gt.sem_label_color[..., ::-1],
+      #                       edge_color=self.scan_gt.sem_label_color[..., ::-1],
+      #                       size=1)
 
     # plot instances
     if self.instances:
       self.inst_vis.set_data(self.scan.points,
-                             face_color=self.scan.inst_label_color[..., ::-1],
-                             edge_color=self.scan.inst_label_color[..., ::-1],
+                             face_color=self.scan_pred.inst_label_color[..., ::-1],
+                             edge_color=self.scan_pred.inst_label_color[..., ::-1],
                              size=1)
 
     # now do all the range image stuff
-    # plot range image
-    data = np.copy(self.scan.proj_range)
-    # print(data[data > 0].max(), data[data > 0].min())
-    data[data > 0] = data[data > 0]**(1 / power)
-    data[data < 0] = data[data > 0].min()
-    # print(data.max(), data.min())
+    # plot range image* self.multiplier
+    data = np.copy(self.scan_pred.proj_range)
+    # print(data[data > 0].max(), data[data > 0].min())self.pred_label_names = pred_label_names
     data = (data - data[data > 0].min()) / \
         (data.max() - data[data > 0].min())
     # print(data.max(), data.min())
@@ -182,12 +202,23 @@ class LaserScanVis:
     self.img_vis.update()
 
     if self.semantics:
-      self.sem_img_vis.set_data(self.scan.proj_sem_color[..., ::-1])
-      self.sem_img_vis.update()
+      self.sem_pred_img_vis.set_data(self.scan_pred.proj_sem_color[..., ::-1])
+      self.sem_pred_img_vis.update()
+      # self.sem_gt_img_vis.set_data(self.scan_gt.proj_sem_color[..., ::-1])
+      # self.sem_gt_img_vis.update()
 
     if self.instances:
       self.inst_img_vis.set_data(self.scan.proj_inst_color[..., ::-1])
       self.inst_img_vis.update()
+
+  # attaching of isoline filter via timer
+  def on_timer(self, event):
+      #image.attach(iso)
+      self.offset += 1
+      if self.offset >= len(self.scan_names):
+            self.offset = 0
+      self.update_scan()
+      #print(f"offset = {self.offset}")
 
   # interface
   def key_press(self, event):
@@ -203,6 +234,12 @@ class LaserScanVis:
       if self.offset <= 0:
         self.offset = len(self.scan_names)-1
       self.update_scan()
+    elif event.key == ' ':
+      if self.timer.running:
+        self.timer.stop()
+      else:
+        self.timer.start()
+        
     elif event.key == 'Q' or event.key == 'Escape':
       self.destroy()
 

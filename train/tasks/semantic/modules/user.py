@@ -64,7 +64,12 @@ class User():
             self.model.load_state_dict(w_dict['state_dict'], strict=True)
         else:
             self.model = SalsaNext(self.parser.get_n_classes())
-            self.model = nn.DataParallel(self.model)
+
+            #Important!! If you want to use the pretrained weights from the authors,
+            #below line should be uncommented because they used two GPUs
+            #If you trained model with one GPU (e.g., my case), below should be commented.
+      
+            #self.model = nn.DataParallel(self.model)
             w_dict = torch.load(modeldir + "/SalsaNext",
                                 map_location=lambda storage, loc: storage)
             self.model.load_state_dict(w_dict['state_dict'], strict=True)

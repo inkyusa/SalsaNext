@@ -58,7 +58,11 @@ class User():
         torch.nn.Module.dump_patches = True
         if self.uncertainty:
             self.model = SalsaNextUncertainty(self.parser.get_n_classes())
-            self.model = nn.DataParallel(self.model)
+            
+            #Important!! If you want to use a pretrained weights using a single GPU
+            #below line should be commented. Otherwise uncomment.
+            
+            #self.model = nn.DataParallel(self.model)
             w_dict = torch.load(modeldir + "/SalsaNext",
                                 map_location=lambda storage, loc: storage)
             self.model.load_state_dict(w_dict['state_dict'], strict=True)
@@ -163,6 +167,7 @@ class User():
 
             proj_output2,log_var2 = self.model(proj_in)
             proj_output = proj_output_r.var(dim=0, keepdim=True).mean(dim=1)
+            proj_argmax = proj_output2[0].argmax(dim=0)
             log_var2 = log_var_r.mean(dim=0, keepdim=True).mean(dim=1)
             if self.post:
                 # knn postproc

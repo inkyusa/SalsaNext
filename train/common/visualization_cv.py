@@ -1,15 +1,20 @@
 import os
 
-import matplotlib
+#import matplotlib
 import numpy as np
 import pykitti
 
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
 
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 import yaml
+import cv2
+import cmapy
+import math
 #import concurrent.futures
+
+from joblib import Parallel, delayed
 
 kitti_basedir = '/home/sa001/workspace/dataset/semantic_kitti/dataset/'
 basedir = '/home/sa001/workspace/SalsaNext/prediction/second_trained_with_uncert/'
@@ -18,11 +23,10 @@ uncerts = 'uncert'
 preds = 'predictions'
 gt = 'labels'
 projected_uncert = 'proj_uncert' # The name of folder to store projected images
-projected_label = 'proj_label' # The name of folder to store projected images
-
+projected_label = 'proj_label2' # The name of folder to store projected images
 config_yaml = '/home/sa001/workspace/SalsaNext/train/tasks/semantic/config/labels/semantic-kitti.yaml'
-
 dataset = pykitti.odometry(kitti_basedir, sequence)
+uncert_cmap = 'jet' #viridis, hsv
 
 EXTENSIONS_LABEL = ['.label']
 EXTENSIONS_LIDAR = ['.bin']
@@ -89,10 +93,12 @@ scan_gt.sort()
 color_map_dict = yaml.safe_load(open(config_yaml))['color_map']
 learning_map = yaml.safe_load(open(config_yaml))['learning_map']
 color_map = {}
+color_map_cv = {}
 uncert_mean = np.zeros(20)
 total_points_per_class = np.zeros(20)
 for key, value in color_map_dict.items():
     color_map[key] = np.array(value, np.float32) / 255.0
+    color_map_cv[key] = value
 
 
 def plot_and_save(label_uncert, label_name, lidar_name, cam2_image_name):
@@ -100,12 +106,13 @@ def plot_and_save(label_uncert, label_name, lidar_name, cam2_image_name):
     uncerts = np.fromfile(label_uncert, dtype=np.float32).reshape((-1))
     velo_points = np.fromfile(lidar_name, dtype=np.float32).reshape(-1, 4)
     try:
-        cam2_image = plt.imread(cam2_image_name)
+        #cam2_image = plt.imread(cam2_image_name)
+        cam2_image = cv2.imread(cam2_image_name)
     except IOError:
         print('detect error img %s' % label_name)
 
-    plt.imshow(cam2_image)
-    # plt.show()
+    #cv2.imshow('cam2_image', cam2_image)
+    #cv2.waitKey(0)
 
     if True:
 
@@ -132,31 +139,28 @@ def plot_and_save(label_uncert, label_name, lidar_name, cam2_image_name):
             u, v = cam2_points[i, :]
             label = labels_projected[i]
             uncert = uncert_projected[i]
+            if math.isnan(uncert):
+                uncert = 0
             if label > 0 and v > 0 and v < 1241 and u > 0 and u < 376:
                 uncert_mean[learning_map[label]] += uncert
                 total_points_per_class[learning_map[label]] += 1
                 if VIS_LABEL == True:
-                    m_circle = plt.Circle((v, u), 1, color=color_map[label][..., ::-1])
+                    cv2.circle(cam2_image, (v, u), 3, color_map_cv[label], cv2.FILLED)
                 else:
-                    m_circle = plt.Circle((v, u), 1,
-                                        color=matplotlib.cm.viridis(uncert),
-                                        alpha=0.4
-                                        )
-                plt.gcf().gca().add_artist(m_circle)
+                    cv2.circle(cam2_image, (v, u), 3, cmapy.color(uncert_cmap, float(uncert)),  cv2.FILLED)
 
-    plt.axis('off')
     if VIS_LABEL == True:
         path = os.path.join(basedir, 'sequences', sequence, projected_label, label_name.split('/')[-1].split('.')[0] + '.png')
     else:
         #uncertainty
         path = os.path.join(basedir, 'sequences', sequence, projected_uncert, label_name.split('/')[-1].split('.')[0] + '.png')
-    plt.savefig(path, bbox_inches='tight', transparent=True, pad_inches=0)
+    cv2.imwrite(path, cam2_image)
+    print("{} saved".format(path.split('/')[-1]))
 
 
-# with concurrent.futures.ProcessPoolExecutor() as pool:
-for label_uncert, label_name, lidar_name, cam2_image_name in zip(scan_uncert, scan_preds, dataset.velo_files, dataset.cam2_files):
-    print(label_name.split('/')[-1])
-    plot_and_save(label_uncert, label_name, lidar_name, cam2_image_name)
+#n_jobs = -1 to use all available CPUs
+Parallel(n_jobs=-1)(delayed(plot_and_save)(label_uncert, label_name, lidar_name, cam2_image_name)
+                          for label_uncert, label_name, lidar_name, cam2_image_name in zip(scan_uncert, scan_preds, dataset.velo_files, dataset.cam2_files))
 print(total_points_per_class)
 print(uncert_mean)
 if __name__ == "__main__":

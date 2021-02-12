@@ -17,7 +17,6 @@ do
       m ) m="$OPTARG" ;;
       s ) s="$OPTARG" ;;
       n ) n="$OPTARG" ;;
-      g ) g="$OPTARG" ;;
       u ) u="$OPTARG" ;;
       c ) c="$OPTARG" ;;
       ? ) helpFunction ;;

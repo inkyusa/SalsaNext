@@ -66,11 +66,27 @@
                 "--sequence",
                 "08",
                 "--predictions",
-                "/home/sa001/workspace/SalsaNext/pred_valid/",
+                "/home/sa001/workspace/SalsaNext/prediction/first_trained",
                 "--ignore_safety",
                 "--offset",
                 "0"
             ],
+        },
+        {
+            "name": "Python: Vis projection uncertainty",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/train/common/visualization.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/train/common"
+        },
+        {
+            "name": "Python: CV Vis projection uncertainty",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/train/common/visualization_cv.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/train/common"
         }
     ]
 }

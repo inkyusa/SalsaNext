@@ -103,15 +103,13 @@ This script will download two models from this repo and store them under `SalsaN
      * ``-s [String]``: Eval on Validation or Train (standard eval on both separately)
      * ```-u [String]```: If you want to infer using an Uncertainty model (default ```false```)
      * ```-c [Int]```: Number of MC sampling to do (default ```30```)
-     * ```-g [Int]```: GPU ID (default ```x```)
-     * ```-n [Int]```: what is this? (default ```xx```)
      
      and the following command will perform inferencing and evaluation.
      
      ```
      ./eval.sh -d /home/user/workspace/dataset/semantic_kitti/dataset/ -p /home/user/workspace/SalsaNext/pred_valid -m /home/user/workspace/SalsaNext/models/pretrained -s valid -n salsanext -c 30 -g 0
      ```
-     `-d` indicates the location of `semantic_kitti` dataset, `-p` is pointing to the folder that will be created and stored all predictions. `-m` denotes the model path one that you want to use for the prediction, `-s` refers to which data split you want to evaluate on (e.g., `[train, valid, test]`). Note that `test` option won't work since `semantic_kitti` dataset doesn't not make the `test` set public (only model submission avaialble). Other switch options are already explained above, please have a look for (`-c`, `-g`, and `-n`).
+     `-d` indicates the location of `semantic_kitti` dataset, `-p` is pointing to the folder that will be created and stored all predictions. `-m` denotes the model path one that you want to use for the prediction, `-s` refers to which data split you want to evaluate on (e.g., `[train, valid, test]`). Note that `test` option won't work since `semantic_kitti` dataset doesn't not make the `test` set public (only model submission avaialble). `-c` indicates the number of Monte Caro samples.
 
 ### Visualization
 

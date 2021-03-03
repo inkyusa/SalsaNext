@@ -17,13 +17,15 @@ import math
 from joblib import Parallel, delayed
 
 kitti_basedir = '/home/sa001/workspace/dataset/semantic_kitti/dataset/'
-basedir = '/home/sa001/workspace/SalsaNext/prediction/second_trained_with_uncert/'
+#basedir = '/home/sa001/workspace/SalsaNext/prediction/second_trained_with_uncert/'
+basedir = '/home/sa001/workspace/SalsaNext/prediction/first_trained_with_uncert/'
 sequence = '08'
 uncerts = 'uncert'
 preds = 'predictions'
 gt = 'labels'
 projected_uncert = 'proj_uncert' # The name of folder to store projected images
-projected_label = 'proj_label2' # The name of folder to store projected images
+#projected_label = 'proj_gt' # The name of folder to store projected images
+projected_label = 'proj_label_' # The name of folder to store projected images
 config_yaml = '/home/sa001/workspace/SalsaNext/train/tasks/semantic/config/labels/semantic-kitti.yaml'
 dataset = pykitti.odometry(kitti_basedir, sequence)
 uncert_cmap = 'jet' #viridis, hsv
@@ -32,7 +34,7 @@ EXTENSIONS_LABEL = ['.label']
 EXTENSIONS_LIDAR = ['.bin']
 EXTENSIONS_IMG = ['.png']
 
-VIS_LABEL = False #set False to save uncertainty projected images
+VIS_LABEL = True #set False to save uncertainty projected images
 if VIS_LABEL == True:
     print("Label visualisation")
     projected_label_path = os.path.join(basedir, 'sequences', sequence, projected_label)
@@ -61,18 +63,6 @@ def is_lidar(filename):
 
 def is_img(filename):
     return any(filename.endswith(ext) for ext in EXTENSIONS_IMG)
-
-
-def get_mpl_colormap(cmap_name):
-    cmap = plt.get_cmap(cmap_name)
-
-    # Initialize the matplotlib color map
-    sm = plt.cm.ScalarMappable(cmap=cmap)
-
-    # Obtain linear color range
-    color_range = sm.to_rgba(np.linspace(0, 1, 256), bytes=True)[:, 2::-1]
-
-    return color_range.reshape(256, 3).astype(np.float32) / 255.0
 
 path = os.path.join(basedir, 'sequences', sequence, uncerts)
 
@@ -106,14 +96,9 @@ def plot_and_save(label_uncert, label_name, lidar_name, cam2_image_name):
     uncerts = np.fromfile(label_uncert, dtype=np.float32).reshape((-1))
     velo_points = np.fromfile(lidar_name, dtype=np.float32).reshape(-1, 4)
     try:
-        #cam2_image = plt.imread(cam2_image_name)
         cam2_image = cv2.imread(cam2_image_name)
     except IOError:
         print('detect error img %s' % label_name)
-
-    #cv2.imshow('cam2_image', cam2_image)
-    #cv2.waitKey(0)
-
     if True:
 
         # Project points to camera.
@@ -141,7 +126,7 @@ def plot_and_save(label_uncert, label_name, lidar_name, cam2_image_name):
             uncert = uncert_projected[i]
             if math.isnan(uncert):
                 uncert = 0
-            if label > 0 and v > 0 and v < 1241 and u > 0 and u < 376:
+            if label >= 0 and label <= 1000 and v > 0 and v < 1241 and u > 0 and u < 376:
                 uncert_mean[learning_map[label]] += uncert
                 total_points_per_class[learning_map[label]] += 1
                 if VIS_LABEL == True:
@@ -159,8 +144,13 @@ def plot_and_save(label_uncert, label_name, lidar_name, cam2_image_name):
 
 
 #n_jobs = -1 to use all available CPUs
-Parallel(n_jobs=-1)(delayed(plot_and_save)(label_uncert, label_name, lidar_name, cam2_image_name)
-                          for label_uncert, label_name, lidar_name, cam2_image_name in zip(scan_uncert, scan_preds, dataset.velo_files, dataset.cam2_files))
+Parallel(n_jobs=1)(delayed(plot_and_save)(label_uncert, label_name, lidar_name, cam2_image_name)
+                         for label_uncert, label_name, lidar_name, cam2_image_name in zip(scan_uncert, scan_gt, dataset.velo_files, dataset.cam2_files))
+
+# for label_uncert, label_name, lidar_name, cam2_image_name in zip(scan_uncert, scan_gt, dataset.velo_files, dataset.cam2_files):
+#     print(label_name.split('/')[-1])
+#     plot_and_save(label_uncert, label_name, lidar_name, cam2_image_name)
+
 print(total_points_per_class)
 print(uncert_mean)
 if __name__ == "__main__":

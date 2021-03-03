@@ -7,7 +7,10 @@ import yaml
 import __init__ as booger
 
 from common.laserscan import LaserScan, SemLaserScan
-from common.laserscanvis import LaserScanVis
+from common.laserscanvis_uncert import LaserScanVisUncert
+
+
+import glob
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser("./visualize.py")
@@ -105,43 +108,62 @@ if __name__ == '__main__':
     scan_names = [os.path.join(dp, f) for dp, dn, fn in os.walk(
         os.path.expanduser(scan_paths)) for f in fn]
     scan_names.sort()
+    proj_pred_img_names = None
     # does sequence folder exist?
     if not FLAGS.ignore_semantics:
         if FLAGS.predictions is not None:
-            label_paths = os.path.join(FLAGS.predictions, "sequences",
+            pred_label_paths = os.path.join(FLAGS.predictions, "sequences",
                                        FLAGS.sequence, "predictions")
-        else:
-            label_paths = os.path.join(FLAGS.dataset, "sequences",
+            gt_label_paths = os.path.join(FLAGS.dataset, "sequences",
                                        FLAGS.sequence, "labels")
-        if os.path.isdir(label_paths):
-            print("Labels folder exists! Using labels from %s" % label_paths)
+        else:
+            gt_label_paths = os.path.join(FLAGS.dataset, "sequences",
+                                       FLAGS.sequence, "labels")
+        if os.path.isdir(pred_label_paths):
+            print("Labels folder exists! Using labels from %s" % pred_label_paths)
         else:
             print("Labels folder doesn't exist! Exiting...")
             quit()
         # populate the pointclouds
-        label_names = [os.path.join(dp, f) for dp, dn, fn in os.walk(
-            os.path.expanduser(label_paths)) for f in fn]
-        label_names.sort()
+        pred_label_names = [os.path.join(dp, f) for dp, dn, fn in os.walk(
+            os.path.expanduser(pred_label_paths)) for f in fn]
+        pred_label_names.sort()
+
+        gt_label_names = [os.path.join(dp, f) for dp, dn, fn in os.walk(
+            os.path.expanduser(gt_label_paths)) for f in fn]
+        gt_label_names.sort()
+
+        #get the list of prediction projected images
+        proj_pred_img_names = glob.glob('/home/sa001/workspace/SalsaNext/prediction/second_trained_with_uncert/sequences/08/proj_label_with_uncert/*.png')
+        proj_pred_img_names.sort()
+
+        proj_uncert_img_names = glob.glob('/home/sa001/workspace/SalsaNext/prediction/second_trained_with_uncert/sequences/08/proj_uncert/*.png')
+        proj_uncert_img_names.sort()
+
+
+
 
         # check that there are same amount of labels and scans
         if not FLAGS.ignore_safety:
-            assert (len(label_names) == len(scan_names))
+            assert (len(pred_label_names) == len(scan_names))
 
     # create a scan
     if FLAGS.ignore_semantics:
         scan = LaserScan(project=True)  # project all opened scans to spheric proj
     else:
         color_dict = CFG["color_map"]
-        #scan = SemLaserScan(color_dict, project=True)
-        scan = SemLaserScan(color_dict, project=True, H=64, W=1024, fov_up=3, fov_down=-25)
+        scan = SemLaserScan(color_dict, project=True)
 
     # create a visualizer
     semantics = not FLAGS.ignore_semantics
     if not semantics:
         label_names = None
-    vis = LaserScanVis(scan=scan,
+    vis = LaserScanVisUncert(scan=scan,
                        scan_names=scan_names,
-                       label_names=label_names,
+                       pred_label_names=pred_label_names,
+                       gt_label_names=gt_label_names,
+                       proj_pred_img_names = proj_pred_img_names,
+                       proj_uncert_img_names = proj_uncert_img_names,
                        offset=FLAGS.offset,
                        semantics=semantics,
                        instances=False)

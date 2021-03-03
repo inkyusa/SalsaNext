@@ -43,14 +43,14 @@ post:
 ################################################################################
 # dataset (to find parser)
 dataset:
-  labels: "kitti"
-  scans: "kitti"
+  labels:  "rellis3d" #"kitti" #"rellis3d"
+  scans: "rellis3d" #"kitti" #"rellis3d"
   max_points: 150000 # max of any scan in dataset
   sensor:
-    name: "HDL64"
+    name: "os1" #"HDL64" #"os1"
     type: "spherical" # projective
-    fov_up: 3
-    fov_down: -25
+    fov_up: 10 #3 #23
+    fov_down: -10 #-25 #-23
     img_prop:
       width: 2048
       height: 64

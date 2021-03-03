@@ -18,7 +18,6 @@ class LaserScanVis:
     self.offset = offset
     self.semantics = semantics
     self.instances = instances
-    self.timer = vispy.app.Timer('auto', iterations=1e9, connect=self.on_timer, start=False)
     # sanity check
     if not self.semantics and self.instances:
       print("Instances are only allowed in when semantics=True")
@@ -190,15 +189,6 @@ class LaserScanVis:
       self.inst_img_vis.set_data(self.scan.proj_inst_color[..., ::-1])
       self.inst_img_vis.update()
 
-  # attaching of isoline filter via timer
-  def on_timer(self, event):
-      #image.attach(iso)
-      self.offset += 1
-      if self.offset >= len(self.scan_names):
-            self.offset = 0
-      self.update_scan()
-      #print(f"offset = {self.offset}")
-
   # interface
   def key_press(self, event):
     self.canvas.events.key_press.block()
@@ -213,12 +203,6 @@ class LaserScanVis:
       if self.offset <= 0:
         self.offset = len(self.scan_names)-1
       self.update_scan()
-    elif event.key == ' ':
-      if self.timer.running:
-        self.timer.stop()
-      else:
-        self.timer.start()
-        
     elif event.key == 'Q' or event.key == 'Escape':
       self.destroy()
 

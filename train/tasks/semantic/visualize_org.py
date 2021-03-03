@@ -105,6 +105,7 @@ if __name__ == '__main__':
     scan_names = [os.path.join(dp, f) for dp, dn, fn in os.walk(
         os.path.expanduser(scan_paths)) for f in fn]
     scan_names.sort()
+
     # does sequence folder exist?
     if not FLAGS.ignore_semantics:
         if FLAGS.predictions is not None:
@@ -132,8 +133,7 @@ if __name__ == '__main__':
         scan = LaserScan(project=True)  # project all opened scans to spheric proj
     else:
         color_dict = CFG["color_map"]
-        #scan = SemLaserScan(color_dict, project=True)
-        scan = SemLaserScan(color_dict, project=True, H=64, W=1024, fov_up=3, fov_down=-25)
+        scan = SemLaserScan(color_dict, project=True)
 
     # create a visualizer
     semantics = not FLAGS.ignore_semantics
@@ -150,7 +150,6 @@ if __name__ == '__main__':
     print("To navigate:")
     print("\tb: back (previous scan)")
     print("\tn: next (next scan)")
-    print("\tspace: toggle continous play")
     print("\tq: quit (exit program)")
 
     # run the visualizer

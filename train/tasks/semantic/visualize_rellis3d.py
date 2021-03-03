@@ -6,8 +6,8 @@ import os
 import yaml
 import __init__ as booger
 
-from common.laserscan import LaserScan, SemLaserScan
-from common.laserscanvis import LaserScanVis
+from common.laserscan_rellis3d import LaserScan, SemLaserScan
+from common.laserscanvis_rellis3d import LaserScanVisRellis3D
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser("./visualize.py")
@@ -133,13 +133,13 @@ if __name__ == '__main__':
     else:
         color_dict = CFG["color_map"]
         #scan = SemLaserScan(color_dict, project=True)
-        scan = SemLaserScan(color_dict, project=True, H=64, W=1024, fov_up=3, fov_down=-25)
+        scan = SemLaserScan(color_dict, project=True, H=64, W=1024, fov_up=22.5, fov_down=-22.5)
 
     # create a visualizer
     semantics = not FLAGS.ignore_semantics
     if not semantics:
         label_names = None
-    vis = LaserScanVis(scan=scan,
+    vis = LaserScanVisRellis3D(scan=scan,
                        scan_names=scan_names,
                        label_names=label_names,
                        offset=FLAGS.offset,

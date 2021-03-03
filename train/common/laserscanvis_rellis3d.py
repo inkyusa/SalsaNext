@@ -7,7 +7,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-class LaserScanVis:
+class LaserScanVisRellis3D:
   """Class that creates and handles a visualizer for a pointcloud"""
 
   def __init__(self, scan, scan_names, label_names, offset=0,
@@ -94,7 +94,7 @@ class LaserScanVis:
     self.img_view = vispy.scene.widgets.ViewBox(
         border_color='white', parent=self.img_canvas.scene)
     self.img_grid.add_widget(self.img_view, 0, 0)
-    self.img_vis = visuals.Image(cmap='viridis')
+    self.img_vis = visuals.Image(cmap='jet')
     self.img_view.add(self.img_vis)
 
     # add semantics
@@ -102,7 +102,7 @@ class LaserScanVis:
       self.sem_img_view = vispy.scene.widgets.ViewBox(
           border_color='white', parent=self.img_canvas.scene)
       self.img_grid.add_widget(self.sem_img_view, 1, 0)
-      self.sem_img_vis = visuals.Image(cmap='viridis')
+      self.sem_img_vis = visuals.Image(cmap='jet')
       self.sem_img_view.add(self.sem_img_vis)
 
     # add instances
@@ -110,7 +110,7 @@ class LaserScanVis:
       self.inst_img_view = vispy.scene.widgets.ViewBox(
           border_color='white', parent=self.img_canvas.scene)
       self.img_grid.add_widget(self.inst_img_view, 2, 0)
-      self.inst_img_vis = visuals.Image(cmap='viridis')
+      self.inst_img_vis = visuals.Image(cmap='jet')
       self.inst_img_view.add(self.inst_img_vis)
 
   def get_mpl_colormap(self, cmap_name):
@@ -145,14 +145,14 @@ class LaserScanVis:
     # print(range_data.max(), range_data.min())
     range_data = range_data**(1 / power)
     # print(range_data.max(), range_data.min())
-    viridis_range = ((range_data - range_data.min()) /
+    jet_range = ((range_data - range_data.min()) /
                      (range_data.max() - range_data.min()) *
                      255).astype(np.uint8)
-    viridis_map = self.get_mpl_colormap("viridis")
-    viridis_colors = viridis_map[viridis_range]
+    jet_map = self.get_mpl_colormap("jet")
+    jet_colors = jet_map[jet_range]
     self.scan_vis.set_data(self.scan.points,
-                           face_color=viridis_colors[..., ::-1],
-                           edge_color=viridis_colors[..., ::-1],
+                           face_color=jet_colors[..., ::-1],
+                           edge_color=jet_colors[..., ::-1],
                            size=1)
 
     # plot semantics
